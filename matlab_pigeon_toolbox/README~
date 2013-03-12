@@ -1,0 +1,34 @@
+The Matlab Pigeon Toolbox Version 1
+
+Updated 18/9/09
+
+Richard Mann (2009) except where stated
+
+Dependencies: Matlab. bsxfun() is used in trim_path() and may not be present in older versions of Matlab, replace with trim_path_R14()
+
+Installation: Put this directory in your Matlab path
+
+Summary of files:
+
+change_path_size: Interpolates to make a path a given length
+ellipse: Plots ellipses at designated points (written by D.G. Long, Brigham Young University)
+mean_and_variance: calculates the arithmetic mean and variance of a cell of paths
+nearest_neighbour: finds the nearest neighbour points between 2 paths and gives the distances
+plot_mean_path_and_variance: does what it says on the tin
+plot_path: ditto
+plot_path_with_metric: plots a path with a colour overlay indicating the value of a metric
+straight_line_path: outputs the beeline of a desigated length between 2 points
+trim_path: trims the path around the start and finish. A seperate trim_path_R14 version is included fpr those using Matlab R14. If so, rename to trim_path
+
+Inputs directory:
+
+These files are to aid in the inputting of standard GPS data
+
+conv_coord_40k: converts longitude, latitude to the co-orinates of our 40k map
+fill_missing_data: largely replicates change_path_size, but with specified timestamps
+read_data_bird: Reads data from a standardised directory for one bird, assumes all files are in correct order and all are to be processed - you can edit the code for specific purposes
+read_data_site: will read in a directory containing multiple directories each being one bird
+
+*** read_standard_data: This is the main file - it will take a filename and find any columns titled 'longitude', 'latitude' and 'time' and output the path and times in a standardised way
+
+readtext: required by above - COPYRIGHT (C) Peder Axensten (peder at axensten dot se), 2006-2007.

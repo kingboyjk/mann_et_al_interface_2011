@@ -1,0 +1,56 @@
+function [x, t] = read_standard_data(filename)
+  %[x,t] = read_standard_data(filename)
+  %
+  %Finds the longitude, latitude and time columns and imports them as x =
+  %[long, lat] and t = time. Re-normalises time to begin at 1.
+  %
+  %
+  %Relies on readtext.m (downloadable, COPYRIGHT (C) Peder Axensten (peder at axensten dot se), 2006-2007.)
+  %
+  %Richard Mann (2009)
+  data = readtext(filename, '\t');
+  titles = data(1, :);
+  longidx = find(strcmpi('longitude', titles));
+  latidx = find(strcmpi('latitude', titles));
+  timeidx=find(strcmpi('time', titles));
+  
+  %Look for time format
+  example_time = data{2, timeidx};
+  times = data(2:end, timeidx);
+  if ~sum(ismember(example_time, ':')) > 0
+      for i = 1:numel(times)
+          times{i} = [times{i}(1:2), ':', times{i}(3:4), ':', times{i}(5:6)]; %Put colons in
+      end
+      
+          
+  end
+  
+     
+      
+      for i = 1:numel(times)
+          t(i) = datenum(times{i});
+      end
+      t=t(:);
+      t = t-t(1);
+      t = t*24*3600;
+      t = t+1; %start t at 1
+      
+  
+  
+  
+  
+  data = readtext(filename, '\t', '', '', 'numeric');
+  x = data(2:end, [longidx, latidx]);
+ 
+  
+  
+  
+ 
+  
+  
+  
+  
+  
+  
+  
+  

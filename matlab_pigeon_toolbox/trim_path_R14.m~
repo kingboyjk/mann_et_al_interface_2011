@@ -1,0 +1,54 @@
+function [y,idx] =trim_path_R14(x, start, finish, r)
+% [x, idx] = trim_path(start, finish, r)
+% Trims a path to remove points within a set distance of the start and
+% finish. Keeps all points after bird FIRST leaves a ring of distance, r,
+% around the start and untilt the bird FIRST enters a ring of distanc, r,
+% around the finish.
+%
+%Inputs: 
+%x: path to trim. If x is a cell function will recurse over elements and
+%return a cell of results
+%start/finish: the start and finish locations to trim around
+%r: the radius of the trim
+%
+%Outputs
+%y: the output path
+%idx: the indices of the retained points
+
+%author: Richard Mann
+%date: 17 March 2009
+
+if iscell(x)
+    for i = 1:numel(x)
+        [y{i}, idx{i}] = trim_path_R14(x{i}, start, finish, r);
+    end
+else
+
+if isempty(start);
+    start = x(1, :);
+end
+if isempty(finish);
+    finish = x(end, :);
+end
+keyboard
+    
+
+idx = [1:size(x,1)]';
+
+%y = bsxfun(@minus, x,start); NOT AVAILBALE IN R14
+y = x- repmat(start, size(x, 1), 1);
+
+idx1 = find(sum(y.^2, 2) > r^2);
+firstleave = min(idx1);
+x(1:firstleave-1, :) = [];
+
+%y=bsxfun(@minus, x, finish); NOT AVAILABLE IN R14
+y = x -repmat(finish, size(x,1), 1);
+
+idx2 = find(sum(y.^2, 2) > r^2);
+firstenter = max(idx2);
+x(firstenter+1:end, :) =[];
+y = x;
+idx = firstleave:firstenter;
+
+end
