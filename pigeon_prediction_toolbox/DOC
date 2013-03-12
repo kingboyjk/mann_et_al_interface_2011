@@ -1,0 +1,90 @@
+Documentation:
+
+To install this toolbox:
+
+Add this directory and its subdirectories to your path.
+
+Then run: mex covMatern32.c %This has previously been successfully compiled on Linux (32 and 64 bit), Windows (32 bit) and Mac (64 bit)
+
+Ensure your version of Matlab includes the functions bsxfun() and mhsample().
+
+**************************************************************************
+
+The functions included in the pigeon prediction toolbox are:
+
+%model = init_bird_model(prior_params)
+%
+%Initialises a model structure with priors and samples
+%If prior_params is a filename, load 'prior_params' from file.
+%
+%See README for sructure of prior_params
+
+--------------------------------------------------------------------------
+
+%model = train_bird_model(model, x)
+%
+%Trains a model created by init_bird_model().
+%
+%Trains the model parameters based on the training paths x. x should be
+%N-by-3 with x, y, t triplets. Do trimming outside of this code. 
+%
+%Uses the Metroplis-Hastings algorithm to assign new samples from the posterior
+%distribution of the hyper-parameters.
+
+---------------------------------------------------------------------------
+
+%model = test_bird_model(model, y, x)
+%Calculates integral p(y|x, theta)P(theta|training) dtheta given a previously trained or untrained model. If model
+%is trained on x this is simply p(y|x). 
+%
+%the calculated log-probability of the test data (y) is given by
+%model.test_logP. model.std_test_logP gives a rough estimate of the
+%accuracy of that answer.
+
+---------------------------------------------------------------------------
+
+%model = marginal_predictions(model, prediction_times, x)
+%
+%Takes a model and gives the posterior ( P(y|x) ) mean and
+%covariance at an inputed set of time samples
+%
+%Find the predicted mean, variance and standard error as model.prediction.
+%{mean, variance, variance_on_mean}
+
+---------------------------------------------------------------------------
+
+% plot_prediction(model, variance_type, number_std, col, plot_tyep)
+%
+% Plots the prediction from the output of prediction_wrapper
+%
+% Inputs: model: The output of prediction_wrapper
+% variance_type: either 'total', 'mean' or 'both'. 'total' plots the total variance
+% (i.e. both uncertainty on the mean path and the variation around the
+% mean). 'mean' plots just the uncertainty on the mean. Both obviously
+% plots both!
+% number_std: The number of standard deviations to plot (default is 1).
+% 1.96 gives a 95% C.I
+% col: plot colour. Default is 'b' (blue)
+% plot_type: 'lines' or 'circles' to represent uncertainty. Default is
+% circles
+
+---------------------------------------------------------------------------
+
+%[t_waypoints, marg_likelihood, MIGratio, x] = find_waypoints(x, prior_params, n, L)
+%
+%Locates up to n waypoints from a set of paths, x, based on a structure
+%containing the priors, prior_params.
+%
+%Each path is resampled to be L points long before the analysis begins.
+%L must be bigger than n.
+%
+%The waypoints are output as proportional time indices between 0 and 1. The
+%marginal likelihood and the MIG ratio can also be output, and the resampled paths.
+%
+%The bayes factor for moving to the m-th waypoint is
+%marg_likelihood(m)-marg_likelihood(m-1).
+
+---------------------------------------------------------------------------
+
+
+

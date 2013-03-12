@@ -1,0 +1,102 @@
+Prediction toolbox for recorded pigeon paths, Interface Journal Version.
+
+NB: This version accompanies the paper 'Objectively identifying landmark use and prediction of flight paths in the homing pigeon using Gaussian processes'
+
+Richard Mann (2010) (Some files Roman Garnett (2009), noted in each file)
+
+Updated 18/05/10
+
+Dependencies: Matlab, Matlab Statistics Toolbox. mhsample() is required and may not be in older versions of Matlab. 
+
+Installation: Put this folder and the subdirectories in your Matlab path. Run: mex covMatern32.c. A specific windows version of covMatern32.c is included (in the directory c_files) in case the standard file fails to compile on your Windows system. Rename this to replace the standard file. 
+
+Purpose:
+
+Calculates the probability of recorded flight paths. Can calculate prior probabilities, P(y), and conditional probabilities, P(y|x).
+
+Can also give a general prediction (mean and variance of future paths) that can be plotted
+
+Includes find_waypoints() to locate the most informative regions of the paths.
+
+Concept:
+
+Uses Gaussian Processes to model position as a function of time. Models both auto-correlation along one flight and the cross-correlation between flights.
+Based on the idea of route-learning (habitual route formation) in pigeons in familiar areas.
+
+Performs full Bayesian inference using Metropolis-Hastings algorithm to perform numerical estimation of Bayesian integrals.
+
+Usage:
+
+Run 'example_bird_script' to see the model applied to some example data.
+
+Basic usage - 
+
+load example_paths %Let x, y, z be cells of paths. These should be downsampled and trimmed before usage as appropriate. Each path has two space co-ords and a time index ([x y t])
+
+load example_priors; % These need to be adjusted to the specific problem - see Priors below
+
+struct1 = init_bird_model(prior_params); % Initiliases a model with the priors and creates samples from the priors of the hyper-parameters
+
+struct2 = train_bird_model(struct1, x); %trains the initialised model using a cell of paths, x, with has [x, y, t] components (t is {0->1}). Creates samples from the posterior of the hyper-parameters
+
+struct3 = test_bird_model(struct2, y, z); %Calculates P(y|z) based on the parameters learnt from x. Typically z may = x.
+
+
+Model may be used (test_bird_model) without training. Samples will represent the prior instead of the posterior conditioned on any paths.
+Model can calculate unconditional prior P(y) using test_bird_model(struct, y, [])
+
+log(P(y|z)) is given by struct.test_logP
+
+
+Graphical predictions can be made using marginal_predictions(struct, z). Gives the mean and variance of P( . | z )
+Gives struct.prediction.[mean, variance, variance_on_mean]
+
+
+Priors
+
+The prior_params structure (example saved in example_priors.mat) contains prior information necessary for the problem. Typical content is
+
+prior_params = 
+                     model: '2step' %The type of model - at the moment this is always '2step'
+                     start: [0 0] %Where paths start [x, y]
+                       end: [2.5300e+03 4.41e+03] $Where paths end [x,y]
+                      trim: 100 %How much of the paths to trim around start and end (to cut circling behaviour around release and loft). Data should be pre-trimmed, but this allows the correct adjustements to be made for that trimming
+     log_input_scale1_mean: -2.3026 %Smoothness factor for the paths
+      log_input_scale1_std: 1 %Uncertainty in the above (usually 1)
+    log_output_scale1_mean: 5.5215 %Scale factor for paths around the habitual path
+     log_output_scale1_std: 1 %uncertainty in the above (usually 1)
+     log_input_scale2_mean: 0 %Smoothness factor for the habitual route
+      log_input_scale2_std: 1 %Uncertainty in the above (usually 1)
+    log_output_scale2_mean: 6.9078 %Scale factor for the habitual route		
+     log_output_scale2_std: 1 %Uncertainty in the above (usually 1)
+            log_noise_mean: 1.6094 %Amount of 'white noise'
+             log_noise_std: 1 %Uncertainty in the above (usually 1)
+	number_of_samples: 1000; %Number of samples for Monte-Carlo integration
+
+The scales should be appropriate for the units used. These numbers are sensible for a system where time runs from 0 to 1 and distances are measured in units of 1 unit =  1 metres.
+
+Monte-Carlo
+
+Uses Matlabs built in function mhsample() from the statistics toolbox
+
+The code will generate the numbe of samples stated, but also runs a 'burn in' of 1000 samples to allow the MH algorithm to converge. Therefore time increases with more samples will not necessarily be linear.
+
+Waypoints/landmarks
+
+[t_waypoints, marg_likelihood, MIGratio, x] = find_waypoints(x, prior_params, n, L)
+
+Locates up to n waypoints from a set of paths, x, based on a structure
+containing the priors, prior_params.
+
+Each path is resampled to be L points long before the analysis begins.
+L must be bigger than n.
+
+The waypoints are output as proportional time indices between 0 and 1. The
+marginal likelihood and the MIG ratio can also be output, and the resampled paths.
+
+The bayes factor for moving to the m-th waypoint is
+marg_likelihood(m)-marg_likelihood(m-1).
+
+
+
+

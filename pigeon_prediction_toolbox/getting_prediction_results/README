@@ -1,0 +1,21 @@
+These files perform the analysis used in the paper
+
+'Objectively identifying landmark use and predicting flight trajectories in the homing pigeon using Gaussian procresses'
+
+to predict actual flight paths (contained in data/allSites40k.mat)
+
+the data file is in the following structure: allSites40k(site).bird(bird_number).path{flight_number}.
+
+the sites are: 1.Horspath. 2. Weston Wood 3. Bladon Heath 4. Church Hanborough
+
+run this:
+
+for site = 1:4
+getResultsScript;
+end
+put_all_together;
+
+Now the output variable 'bigX2' should correspond to the curve in Figure 1, with upper and lower quartiles given by bigeX2(:, 1:2) 
+
+
+Richard Mann (2010)
